@@ -1,0 +1,4 @@
+postgres/
+postgres/data/
+postgres_data/
+**/data/

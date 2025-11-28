@@ -1,0 +1,12 @@
+fastapi[all]>0.115,<0.116
+alembic>1.14,<1.15
+passlib[bcrypt] 
+pyjwt
+Faker
+flake8
+pytest
+apscheduler
+fastapi-cache2[redis]
+psycopg2-binary
+fastapi-mail[httpx]
+sentry-sdk[fastapi]

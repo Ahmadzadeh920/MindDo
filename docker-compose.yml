@@ -1,0 +1,69 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: minddo-postgres
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  redis:
+    image: redis:alpine
+    container_name: minddo-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    container_name: minddo-smtp
+    restart: always
+    ports:
+      - "5000:80"   # web UI
+      - "25:25"     # SMTP
+      - "143:143"   # IMAP
+    volumes:
+      - smtp4dev_data:/smtp4dev
+
+  backend:
+    build:
+      context: .
+    container_name: minddo-backend
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/core
+    ports:
+      - "8000:8000"
+    command: uvicorn presentation.api.fastapi.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+  smtp4dev_data:
