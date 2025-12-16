@@ -1,8 +1,10 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 from domain.entities.users import User
 from domain.entities.passwords import Password
 from domain.interfaces.user_repository import UserRepository    
 from domain.services.password_hasher import IPasswordHasher
+from domain.services.normalizers import normalize_username
+
 
 class CreateUserUseCase:
     """
@@ -19,12 +21,13 @@ class CreateUserUseCase:
 
     def execute(self,   username: str, email: str, plain_text_password: str) -> User:
         hashed_password = self.password_hasher.hash(plain_text_password)
-        password_obj = Password(hashed_password)
+       
+        normalized_username = normalize_username(username)
         new_user = User(
-            id=UUID(int=0),  # Placeholder, actual ID will be set by the repository
-            username=username,
+            id=uuid4(),  # <--- GENERATE A NEW, UNIQUE UUID HERE
+            username=normalized_username,
             email=email,
-            _password=password_obj
+            hashed_password=hashed_password
         )
 
         created_user = self.user_repository.create(new_user)

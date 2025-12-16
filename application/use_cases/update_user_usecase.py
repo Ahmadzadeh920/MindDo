@@ -1,7 +1,7 @@
 
 from domain.interfaces.user_repository import UserRepository
 from domain.entities.users import User
-
+from domain.services.normalizers import normalize_username
 
 
 
@@ -33,8 +33,9 @@ class UpdateUserUseCase:
         if str(user_id) != current_user_id:
             raise PermissionError("Cannot create task for another user")
         
-        
-        
+    
+        if "username" in updated and updated["username"] is not None:
+            updated["username"] = normalize_username(updated["username"])
 
         for key, value in updated.items():
             setattr(user_obj, key , value)

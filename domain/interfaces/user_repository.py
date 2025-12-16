@@ -51,3 +51,6 @@ class UserRepository(ABC):
     def list_all(self) -> list[User]:   
         """Return a list of all Users."""
         pass
+    @abstractmethod
+    def get_by_username_or_email(self):
+        pass

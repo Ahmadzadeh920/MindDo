@@ -1,12 +1,14 @@
 fastapi[all]>0.115,<0.116
 alembic>1.14,<1.15
-passlib[bcrypt] 
-pyjwt
-Faker
-flake8
-pytest
-apscheduler
-fastapi-cache2[redis]
-psycopg2-binary
-fastapi-mail[httpx]
-sentry-sdk[fastapi]
+passlib[bcrypt] ==1.7.4
+bcrypt==4.0.0
+pyjwt==2.10.1
+Faker==38.2.0
+flake8==7.3.0
+pytest==9.0.1
+apscheduler==3.11.1
+fastapi-cache2[redis]==0.2.2
+psycopg2-binary==2.9.11
+fastapi-mail[httpx]==1.5.8
+sentry-sdk[fastapi]==2.46.0
+locust==2.42.5

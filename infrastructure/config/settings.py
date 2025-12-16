@@ -29,7 +29,13 @@ class Settings(BaseSettings):
 
     # JWT / Auth
     SECRET_KEY: str = Field("super-secret-key", env="SECRET_KEY")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    JWT_SECRET_KEY: str = Field(..., env="JWT_SECRET_KEY")
+    JWT_ALGORITHM: str = Field("HS256", env="JWT_ALGORITHM")
+    ACCESS_TOKEN_EXPIRES_MINUTES: int = Field(15, env="ACCESS_TOKEN_EXPIRES_MINUTES")
+    REFRESH_TOKEN_EXPIRES_DAYS: int = Field(7, env="REFRESH_TOKEN_EXPIRES_DAYS")
+
+    # optional redis for blacklist
+    REDIS_URL: str | None = Field(None, env="REDIS_URL")
 
     
     # Redis

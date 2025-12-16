@@ -5,7 +5,10 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 
 # add project root to sys.path
-sys.path.append(os.path.join(os.path.dirname(__file__), "../../../.."))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 
 from infrastructure.config.settings import settings
 from infrastructure.db.sqlalchemy_engine import Base

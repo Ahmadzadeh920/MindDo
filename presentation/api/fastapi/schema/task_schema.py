@@ -1,24 +1,36 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from typing import Optional 
 from domain.entities.tasks import Task, TaskStatus
 
-class TaskCreateSchema(BaseModel):
-    title: str = Field(..., min_length=1, max_length=100)
-    description: Optional[str] 
-    status: TaskStatus = Field(default=TaskStatus.PENDING)
-    user_id: str
 
-    @validator("status")
-    def validate_status(cls, v, pre = True, always = True):
+# ============================================
+# Base Schema (Shared by Create, Update, Response)
+# ============================================
+class BaseTaskSchema(BaseModel):
+    title: Optional[str] = Field(None, min_length=1, max_length=100)
+    description: Optional[str]
+    status: Optional[TaskStatus]
+
+    # Centralized validation
+    @field_validator("status", mode="before")
+    def validate_status(cls, v):
         if v is None:
-            return TaskStatus.PENDING
+            return None
         if not isinstance(v, TaskStatus):
             try:
-                v = TaskStatus(v)
+                return TaskStatus(v)
             except ValueError:
                 raise ValueError(f"Invalid status value: {v}")
         return v
+
+
+class TaskCreateSchema(BaseTaskSchema):
+    title: str = Field(..., min_length=1, max_length=100)
+    status: TaskStatus = Field(default=TaskStatus.PENDING)
+    user_id: str
+
+    
 
     def to_entity(self) -> Task:
         return Task(
@@ -29,20 +41,8 @@ class TaskCreateSchema(BaseModel):
         )
 
 
-class TaskUpdateSchema(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=100)
-    description: Optional[str]
-    status: Optional[TaskStatus]
-
-    @validator("status")
-    def validate_status(cls, v):
-        if v is not None and not isinstance(v, TaskStatus):
-            try:
-                v = TaskStatus(v)
-            except ValueError:
-                raise ValueError(f"Invalid status value: {v}")
-        return v
-
+class TaskUpdateSchema(BaseTaskSchema):
+   
     def apply_updates(self, task:Task)-> Task:
         if self.title is not None:
             task.update_title(new_title=self.title)
@@ -52,7 +52,7 @@ class TaskUpdateSchema(BaseModel):
             task.update_status(new_status=self.status)
         return task
 
-class TaskResponseSchema(BaseModel):
+class TaskResponseSchema(BaseTaskSchema):
     id: str
     title: str
     description: Optional[str]
@@ -61,3 +61,4 @@ class TaskResponseSchema(BaseModel):
 
     class Config:
         orm_mode = True
+        model_config = {"from_attributes": True}
