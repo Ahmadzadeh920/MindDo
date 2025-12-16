@@ -24,7 +24,10 @@ This repository is designed to:
 
 This project follows Clean Architecture (Robert C. Martin) principles:
 
-Presentation → Application → Domain ← Infrastructure
+
+<p align="center">
+  <img src="CleanArchitecture.jpg" alt="Alternative Text for Accessibility" width="500" style="display: block; margin: 0 auto;">
+</p>
 
 ### Key rules
 
